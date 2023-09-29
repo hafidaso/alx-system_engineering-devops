@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # displays Best School 10 times.
 
-for (( h=1; h<=10; h++ ))
+count=1
+while [ $count -le 10 ]
 do
     echo "Best School"
+    count=$((count + 1))
 done
+
+
