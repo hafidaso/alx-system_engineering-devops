@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-# use ssh to connect to the server
+# using ssh to connect to a server
 
-# user="ubuntu"
-# ip_remote_server="100.25.183.136"
-
-# private_key="~/.ssh/school"
-
-# Expand the tilde (~) in the private key path
-# private_key=$(eval echo "$private_key")
-
-# Use SSH with single-character flags to connect
-# ssh -i "$private_key" "$user@$ip_remote_server"
-ssh -i ~/.ssh/school ubuntu@100.25.183.136
+ssh ubuntu -i ~/.ssh/school
