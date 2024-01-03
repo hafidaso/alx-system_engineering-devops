@@ -1,24 +1,39 @@
 #!/usr/bin/python3
-# csv exported
+""" Using what you did in the task #0, extend your Python script
+to export data in the CSV format. """
 import csv
-from requests import get
+import requests
 from sys import argv
 
 
-def cvsWrite(user):
-    """writes to csv"""
-    data = get('https://jsonplaceholder.typicode.com/todos?userId={}'.format(
-        user)).json()
-    name = get('https://jsonplaceholder.typicode.com/users/{}'.format(
-        user)).json().get('username')
-    employ_data = open('{}.csv'.format(user), 'w')
-    cwrite = csv.writer(employ_data, quoting=csv.QUOTE_ALL)
-    for line in data:
-        lined = [line.get('userId'), name,
-                 line.get('completed'), line.get('title')]
-        cwrite.writerow(lined)
-    employ_data.close()
+def Rest_API():
+    """ Get data """
+    # Validates if argument is integer and has index
+    try:
+        ID = int(argv[1])
+    except ValueError:
+        print("Value Error")
+        exit()
+    except IndexError:
+        print("Index Error")
+        exit()
+
+    # Get Method
+    todo = requests.get('https://jsonplaceholder.typicode.com/todos?userId={}'
+                        .format(ID))
+    user = requests.get('https://jsonplaceholder.typicode.com/users/{}'
+                        .format(ID))
+
+    username = user.json().get('username')
+
+    # Print
+    with open("{}.csv".format(ID), "w") as fo:
+        writer = csv.writer(fo, quoting=csv.QUOTE_ALL)
+        for data in todo.json():
+            text = data.get("title")
+            task = data.get("completed")
+            writer.writerow([ID, username, task, text])
 
 
-if __name__ == "__main__":
-    cvsWrite(argv[1]) 
+if __name__ == '__main__':
+    Rest_API()
