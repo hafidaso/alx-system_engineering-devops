@@ -1,23 +1,39 @@
 #!/usr/bin/python3
-"""Exports to-do list information for a given employee ID to CSV format."""
+"""a module that request data and save in csv format"""
 import csv
+import json
 import requests
-import sys
-import urllib3
-
+from sys import argv
 
 
 if __name__ == "__main__":
-    user_id = sys.argv[1]
-    url = "https://jsonplaceholder.typicode.com/"
-    user = requests.get(url + "users/{}".format(user_id), verify=False).json()
-    username = user.get("username")
-    todos = requests.get(url + "todos", params={"userId": user_id}, verify=False).json()
+    if argv[1] is None or type(int(argv[1])) is not int:
+        exit()
+    filename = argv[1] + ".csv"
+    url = "https://jsonplaceholder.typicode.com"
+    try:
+        res_user = requests.get(url + "/users/" + argv[1])
+        user = res_user.json()
+    except:
+        exit()
+    try:
+        res_todo = requests.get(url + "/todos")
+        things = res_todo.json()
+    except:
+        exit()
+    EMPLOYEE_NAME = user.get("username", None)
 
-    with open("{}.csv".format(user_id), "w", newline="") as csvfile:
-        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
-        [writer.writerow(
-            [user_id, username, t.get("completed"), t.get("title")]
-         ) for t in todos]
-
-        
+    with open(filename, "w") as f:
+        csv_fields = ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS",
+                      "TASK_TITLE"]
+        writer = csv.DictWriter(f, fieldnames=csv_fields)
+        writer.writeheader()
+        for thing in things:
+            row_dict = {}
+            if thing.get("userId", None) == int(argv[1]):
+                row_dict["USER_ID"] = thing.get("userId", None)
+                row_dict["USERNAME"] = EMPLOYEE_NAME
+                row_dict["TASK_COMPLETED_STATUS"] = thing.get("completed")
+                row_dict["TASK_TITLE"] = thing.get("title", None)
+                json.dumps(row_dict)
+                writer.writerow(row_dict) 
