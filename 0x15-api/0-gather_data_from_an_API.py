@@ -1,36 +1,28 @@
+#!/usr/bin/python3
+"""
+This Python script retrieves the progress of an employee's TODO list based on their ID
+using a specified REST API.
+"""
 import requests
 import sys
 
-def get_employee_todo_list_progress(employee_id):
-    # API endpoints
-    users_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
-    todos_url = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
+def fetch_todo_progress(employee_id):
+    base_url = 'https://jsonplaceholder.typicode.com/'
+    user_info = requests.get(f'{base_url}users/{employee_id}').json()
+    tasks = requests.get(f'{base_url}todos', params={'userId': employee_id}).json()
 
-    # Fetching user data
-    user_response = requests.get(users_url)
-    user_data = user_response.json()
+    # Filtering completed tasks
+    tasks_done = [task["title"] for task in tasks if task['completed']]
+    print(f"Employee {user_info.get('name')} is done with tasks({len(tasks_done)}/{len(tasks)})")
+    
+    # Printing completed tasks
+    for task_title in tasks_done:
+        print(f"\t {task_title}")
 
-    # Fetching todo list data
-    todos_response = requests.get(todos_url)
-    todos_data = todos_response.json()
-
-    # Calculating progress
-    total_tasks = len(todos_data)
-    completed_tasks = sum(task['completed'] for task in todos_data)
-
-    # Displaying output
-    print(f"Employee {user_data['name']} is done with tasks({completed_tasks}/{total_tasks}):")
-    for task in todos_data:
-        if task['completed']:
-            print(f"\t {task['title']}")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) > 1:
-        try:
-            employee_id = int(sys.argv[1])
-            get_employee_todo_list_progress(employee_id)
-        except ValueError:
-            print("Please provide a valid integer as employee ID.")
+        employee_id = sys.argv[1]
+        fetch_todo_progress(employee_id)
     else:
-        print("Employee ID not provided. Usage: python script.py <employee_id>")
+        print("Usage: script.py <employee_id>")
 
